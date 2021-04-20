@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+</head>
+{% block title %} Maps {% endblock title %}
+
+{% block content %}
+<div class = "firstclass">
+    <h2> Maps </h2>>
+    <div class="row">
+        <div class ="col-xl-12 mb-5 mb-xl-0">
+            <div class = "card shadow fade-in-bottom">
+                <div class="card-body plotly worldmap">
+                    <body>
+                
+                    {% autoescape off %}
+                    {{ texas_counties }}
+                    {% endautoescape %}
+                </body>
+            </div>
+            <div style="position: absolute; padding:1.25rem 1.5rem;">
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</html>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    $('.nav-item a').removeClass('active')
+    $('.maps-item a').addClass('active')
+</script>
+{% endblock javascripts %}
