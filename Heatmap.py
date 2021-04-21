@@ -4,6 +4,7 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash. dependencies import Input, Output
+import timeline
 
 app = dash.Dash(__name__)
 
@@ -17,7 +18,14 @@ app.layout = html.Div([
             {"label": "2021", "value":2021}],
         value=2021,
         ),
-
+    dcc.RangeSlider(
+        id='my_slider',
+        min = 1,
+        max = timeline.maxMarks,
+        step = 1,
+        value = [1],
+        marks = timeline.tags,
+    ),
     dcc.Graph(id='us_heatmap', figure={})
 
 ])
