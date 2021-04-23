@@ -5,9 +5,12 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash. dependencies import Input, Output
 
+
 app = dash.Dash(__name__)
 
 df = pd.read_csv("us-statesdates.csv")#changed
+df2 = pd.read_csv("csvData.csv")
+df = pd.merge(df, df2)
 print (df[:5])
 
 app.layout = html.Div([
@@ -31,11 +34,11 @@ def graph(current_year):
     fig = pe.choropleth(
             data_frame=df,
             locationmode='USA-states',
-            locations=df.fips,#changed
+            locations='Code',#changed
             animation_frame='date',
             scope='usa',
             color= 'cases',#changed
-            hover_data=['state','cases','date'],#changed
+            hover_data=['state','cases'],#changed
             color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
             labels={'cases': 'Number of positive cases: '},#changed
             template='seaborn'
