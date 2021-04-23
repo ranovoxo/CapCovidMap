@@ -6,7 +6,6 @@ import dash_core_components as dcc
 from dash. dependencies import Input, Output
 import plotly.io as pio
 app = dash.Dash(__name__)
-import topbar
 
 df = pd.read_csv("us-statesdates.csv")#changed
 df2 = pd.read_csv("csvData.csv")
