@@ -13,7 +13,7 @@ with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-c
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-df= pd.read_csv('covid-19-data/us-counties.csv')
+df= pd.read_csv('us-counties.csv')
 df['new_date'] = pd.to_datetime(df['date'])
 df['Year-Week'] = df['new_date'].dt.strftime('%Y-%U')
 df.head()
