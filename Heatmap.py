@@ -14,13 +14,24 @@ df = pd.merge(df, df2)
 
 print (df)
 
-app.layout = html.Div([
+fig = pe.choropleth(
+    data_frame=df,
+    locationmode='USA-states',
+    locations='Code',#changed
+    animation_frame='date',
+    scope='usa',
+    color='cases',#changed
+    hover_data=['state','cases','date'],#changed
+    color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
+    labels={'cases': 'Number of positive cases: '},#changed
+    template='seaborn'
+    #template='plotly_dark'
 
-    dcc.Dropdown(id="year",
-        options=[
-            {"label": "2021", "value":2021}],
-        value=2021,
-        ),
+    )
+fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
+fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 10
+
+app.layout = html.Div([
      html.Div([
         dcc.Input(
         id="input",
@@ -28,36 +39,13 @@ app.layout = html.Div([
         placeholder="State",
         value='',
         ),
-        html.Button('Enter', id='button'),  
+        html.Button('Enter', id='button'),
         html.Div (id='output-container-button', children='enter a value and press submit'),
-     ]),  
-     
-    dcc.Graph(id='us_heatmap', figure={}),
+     ]),
+
+    dcc.Graph(figure=fig)
 ])
 
-@app.callback(
-        Output(component_id='us_heatmap',component_property='figure'),
-        [Input(component_id='year',component_property='value')],
-    )
-def graph(current_year):
-
-    fig = pe.choropleth(
-            data_frame=df,
-            locationmode='USA-states',
-            locations='Code',#changed
-            animation_frame='date',
-            scope='usa',
-            color='cases',#changed
-            hover_data=['state','cases','date'],#changed
-            color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
-            labels={'cases': 'Number of positive cases: '},#changed
-            template='seaborn'
-            #template='plotly_dark'
-        
-        )
-    fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
-    fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 10
-    return fig
 @app.callback(
         Output(component_id='output-container-button',component_property='children'),
         [Input(component_id='button', component_property='n_clicks')],
@@ -74,7 +62,7 @@ def update_output(n_clicks, value):
             f"{tempDeaths:,}",
             f"{tempCases:,}",
     ),
-    
+
 def findState(value):
     tempList = df['state'].tolist()
     datelist = df['date'].tolist()
@@ -84,7 +72,7 @@ def findState(value):
         if value == tempList[i]:
             total = x[i]
             ##print(value)
-               
+
     return total
 def findCases(value):
     tempList = df['state'].tolist()
@@ -95,6 +83,6 @@ def findCases(value):
         if value == tempList[i]:
             total = x[i]
     return total
-        
+
 if __name__ == '__main__':
     app.run_server(debug=True)
