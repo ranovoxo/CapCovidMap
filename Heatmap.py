@@ -69,7 +69,7 @@ def update_output(n_clicks, value):
         tempDeaths = findState(value)  ## returns number of deaths in state
         tempCases = findCases(value)   ## returns number of comfirmed cases
         ##print(temp)
-        return '{} has {} total deaths and {} comfirmed cases'.format(
+        return '{} has {} total deaths and {} confirmed cases'.format(
             value,
             f"{tempDeaths:,}",
             f"{tempCases:,}",
