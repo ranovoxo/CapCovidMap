@@ -6,49 +6,30 @@ import dash_core_components as dcc
 from dash. dependencies import Input, Output
 import dash_bootstrap_components as dbc
 
-#loading information about the counties
-from urllib.request import urlopen
-import json
-with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
-    counties = json.load(response)
-
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-state_df = pd.read_csv("us-statesdates.csv")#changed
+df = pd.read_csv("us-statesdates.csv")#changed
 df2 = pd.read_csv("csvData.csv")
-state_df = pd.merge(state_df, df2)
+df = pd.merge(df, df2)
 
-county_df= pd.read_csv('us-counties.csv')
-county_df['new_date'] = pd.to_datetime(county_df['date'])
-county_df['Year-Week'] = county_df['new_date'].dt.strftime('%Y-%U')
-county_df.head()
+print (df)
 
-county_df.shape
-county_df = county_df.sort_values(by=['county', 'state', 'new_date'])
-df_us = county_df.groupby(['county', 'state', 'fips', 'Year-Week']).first().reset_index()
-df_us
-df_us.head(100)
-df_us['cases'].max(), df_us['cases'].min()
-counties["features"][100]
-df_us = df_us.sort_values(by=['Year-Week'])
-# print (df)
+fig = pe.choropleth(
+    data_frame=df,
+    locationmode='USA-states',
+    locations='Code',#changed
+    animation_frame='date',
+    scope='usa',
+    color='cases',#changed
+    hover_data=['state','cases','date'],#changed
+    color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
+    labels={'cases': 'Number of positive cases: '},#changed
+    template='seaborn'
+    #template='plotly_dark'
 
-# fig = pe.choropleth(
-#     data_frame=df,
-#     locationmode='USA-states',
-#     locations='Code',#changed
-#     animation_frame='date',
-#     scope='usa',
-#     color='cases',#changed
-#     hover_data=['state','cases','date'],#changed
-#     color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
-#     labels={'cases': 'Number of positive cases: '},#changed
-#     template='seaborn'
-#     #template='plotly_dark'
-
-#     )
-# fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
-# fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 10
+    )
+fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
+fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 10
 
 app.layout = html.Div([
      html.Div([
@@ -62,64 +43,8 @@ app.layout = html.Div([
         html.Div (id='output-container-button', children='enter a value and press submit'),
      ]),
 
-    dcc.RadioItems(id="slct_map",
-        options=[
-            {'label': 'County', 'value': 'county'},
-            {'label': 'State',  'value': 'state'}
-        ],
-        value='county'
-    ),
-    html.Br(),
-    dcc.Graph(id='heatmap', figure={})
+    dcc.Graph(figure=fig)
 ])
-
-@app.callback(
-    Output(component_id='heatmap', component_property='figure'),
-    Input(component_id='slct_map', component_property='value')
-)
-def update_map(option_slctd):
-
-    if option_slctd == 'county':
-        fig = pe.choropleth(
-            data_frame=df_us,
-            geojson=counties,
-            #locationmode='USA-states',
-            locations='fips',#changed
-            animation_frame='Year-Week',
-            scope='usa',
-            color='cases',#changed
-            hover_data=['county','cases','date'],#changed
-            color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
-            labels={'cases': 'Number of positive cases: '},#changed
-            template='seaborn'
-            #template='plotly_dark'
-
-            )
-        fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
-        fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 10
-
-    if option_slctd == 'state':
-        fig = pe.choropleth(
-            data_frame=state_df,
-            locationmode='USA-states',
-            locations='Code',#changed
-            animation_frame='date',
-            scope='usa',
-            color='cases',#changed
-            hover_data=['state','cases','date'],#changed
-            color_continuous_scale=pe.colors.sequential.Aggrnyl[::-1],
-            labels={'cases': 'Number of positive cases: '},#changed
-            template='seaborn'
-            #template='plotly_dark'
-
-            )
-        fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
-        fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 10
-
-    return fig
-
-
-
 
 @app.callback(
         Output(component_id='output-container-button',component_property='children'),
@@ -139,9 +64,9 @@ def update_output(n_clicks, value):
     ),
 
 def findState(value):
-    tempList = state_df['state'].tolist()
-    datelist = state_df['date'].tolist()
-    x = state_df['deaths'].tolist()
+    tempList = df['state'].tolist()
+    datelist = df['date'].tolist()
+    x = df['deaths'].tolist()
     total =0
     for i in range(len(datelist)):
         if value == tempList[i]:
@@ -150,9 +75,9 @@ def findState(value):
 
     return total
 def findCases(value):
-    tempList = state_df['state'].tolist()
-    datelist = state_df['date'].tolist()
-    x = state_df['cases'].tolist()
+    tempList = df['state'].tolist()
+    datelist = df['date'].tolist()
+    x = df['cases'].tolist()
     total =0
     for i in range(len(datelist)):
         if value == tempList[i]:
